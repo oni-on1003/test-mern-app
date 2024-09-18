@@ -4,7 +4,7 @@ import express from 'express'
 const app = express();
 
 app.get('/api', (req, res)=>{
-    return res.send(req.query);
+    return res.json(req.query);
 });
 
 app.get('/vulnerable', (req, res)=>{
