@@ -11,10 +11,10 @@ app.get('/vulnerable', (req, res)=>{
     const userName = req.query.name;
 
     try {
-        const result = execSync(userName, {encoding: 'utf-8'});
-        return res.send(result);
+        // const result = execSync(userName, {encoding: 'utf-8'});
+        return res.json(userName);
     } catch (error) {
-        return res.send(error);
+        return res.json({'error': true});
     }
 });
 
