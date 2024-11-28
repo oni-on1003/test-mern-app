@@ -61,6 +61,7 @@ jobs:
           echo 'expect -re "FortiToken: "' >> vpnconnect.exp
           FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
           TOKEN=$(oathtool --totp -b "$FORTITOKEN_SECRET")
+          echo "TOKEN=$TOKEN" >> $GITHUB_ENV
           echo 'send -- "$TOKEN\r"' >> vpnconnect.exp
           echo 'expect eof' >> vpnconnect.exp
           chmod +x vpnconnect.exp
