@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates oathtool gnome-keyring
+          sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates oathtool
         
       - name: Download and Install FortiClient VPN
         run: |
@@ -56,7 +56,7 @@ jobs:
         run: |
           echo '#!/usr/bin/expect -f' > vpnconnect.exp
           echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ secrets.VPN_USER }} --password' >> vpnconnect.exp
-          echo 'expect -exact "password:"' >> vpnconnect.exp
+          echo 'expect -exact "Password:"' >> vpnconnect.exp
           echo 'send -- "${{ secrets.VPN_PASS }}\r"' >> vpnconnect.exp 
           #echo 'set timeout -1' >> vpnconnect.exp
           echo 'expect -re "Confirm "' >> vpnconnect.exp
