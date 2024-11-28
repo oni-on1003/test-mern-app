@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates 
+          sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates oathtool
         
       - name: Download and Install FortiClient VPN
         run: |
@@ -58,6 +58,9 @@ jobs:
           echo 'expect -re "Confirm "' >> vpnconnect.exp
           echo 'send -- "y\r"' >> vpnconnect.exp
           #echo 'set timeout -1' >> vpnconnect.exp
+          echo 'expect -re "FortiToken: "' >> vpnconnect.exp
+          FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
+          echo 'send -- "$(oathtool --totp -b "$FORTITOKEN_SECRET\r"' >> vpnconnect.exp
           echo 'expect eof' >> vpnconnect.exp
           chmod +x vpnconnect.exp
           ./vpnconnect.exp
