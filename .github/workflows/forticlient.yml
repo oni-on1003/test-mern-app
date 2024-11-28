@@ -54,10 +54,10 @@ jobs:
           echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ secrets.VPN_USER }} --password' >> vpnconnect.exp
           echo 'expect -exact "password:"' >> vpnconnect.exp
           echo 'send -- "${{ secrets.VPN_PASS }}\r"' >> vpnconnect.exp 
-          echo 'set timeout 60' >> vpnconnect.exp
-          echo 'expect -re "Confirm (y/n) "' >> vpnconnect.exp
+          #echo 'set timeout -1' >> vpnconnect.exp
+          echo 'expect -re "Confirm "' >> vpnconnect.exp
           echo 'send -- "y\r"' >> vpnconnect.exp
-          echo 'set timeout -1' >> vpnconnect.exp
+          #echo 'set timeout -1' >> vpnconnect.exp
           echo 'expect eof' >> vpnconnect.exp
           chmod +x vpnconnect.exp
           ./vpnconnect.exp
