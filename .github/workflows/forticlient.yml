@@ -47,6 +47,10 @@ jobs:
         run: |
          /opt/forticlient/fortivpn list
          /opt/forticlient/fortivpn view myvpn
+         FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
+         TOKEN=$(oathtool --totp -b "$FORTITOKEN_SECRET")
+         echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+         echo ${{ env.TOKEN }}
 
       - name: Create VPN Connect Script
         run: |
@@ -59,10 +63,6 @@ jobs:
           echo 'send -- "y\r"' >> vpnconnect.exp
           #echo 'set timeout -1' >> vpnconnect.exp
           echo 'expect -re "FortiToken: "' >> vpnconnect.exp
-          FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
-          TOKEN=$(oathtool --totp -b "$FORTITOKEN_SECRET")
-          echo "TOKEN=$TOKEN" >> $GITHUB_ENV
-          echo ${{ env.TOKEN }}
           echo 'send -- "${{ env.OTP }}\r"' >> vpnconnect.exp
           echo 'expect eof' >> vpnconnect.exp
           chmod +x vpnconnect.exp
