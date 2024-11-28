@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates oathtool
+          sudo apt-get install -y libnss3-tools ppp libappindicator1 expect ca-certificates oathtool gnome-keyring
         
       - name: Download and Install FortiClient VPN
         run: |
