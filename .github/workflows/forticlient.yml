@@ -62,7 +62,7 @@ jobs:
           echo 'expect -re "Confirm "' >> vpnconnect.exp
           echo 'send -- "y\r"' >> vpnconnect.exp
           #echo 'set timeout -1' >> vpnconnect.exp
-          echo 'expect -re "FortiToken: "' >> vpnconnect.exp
+          echo 'expect -re "FortiToken:"' >> vpnconnect.exp
           echo 'send -- "${{ env.OTP }}\r"' >> vpnconnect.exp
           echo 'expect eof' >> vpnconnect.exp
           chmod +x vpnconnect.exp
