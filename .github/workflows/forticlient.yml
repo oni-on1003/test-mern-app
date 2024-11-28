@@ -60,7 +60,8 @@ jobs:
           #echo 'set timeout -1' >> vpnconnect.exp
           echo 'expect -re "FortiToken: "' >> vpnconnect.exp
           FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
-          echo 'send -- "$(oathtool --totp -b "$FORTITOKEN_SECRET\r"' >> vpnconnect.exp
+          TOKEN=$(oathtool --totp -b "$FORTITOKEN_SECRET")
+          echo 'send -- "$TOKEN\r"' >> vpnconnect.exp
           echo 'expect eof' >> vpnconnect.exp
           chmod +x vpnconnect.exp
           ./vpnconnect.exp
