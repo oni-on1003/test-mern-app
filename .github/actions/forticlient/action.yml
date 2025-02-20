@@ -34,8 +34,8 @@ runs:
         #!/usr/bin/expect -f
         spawn /opt/forticlient/fortivpn edit myvpn
         expect -re "Type" { send -- "1\r" }
-        expect -re "Remote Gateway:" { send -- "${VPN_HOST}\r" }
-        expect -re "Port" { send -- "${VPN_PORT}\r" }
+        expect -re "Remote Gateway:" { send -- "${inputs.VPN_HOST}\r" }
+        expect -re "Port" { send -- "${inputs.VPN_PORT}\r" }
         expect -re "Authentication" { send -- "3\r" }
         expect -re "Certificate" { send -- "3\r" }
         expect eof
