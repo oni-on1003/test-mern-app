@@ -51,6 +51,7 @@ jobs:
           echo 'set timeout -1' >> create_vpn_profile.exp
           echo 'expect eof' >> create_vpn_profile.exp
           chmod +x create_vpn_profile.exp
+          ./create_vpn_profile.exp && rm ./create_vpn_profile.exp
 
       - name: Set up tmate session
         uses: mxschmitt/action-tmate@v3
@@ -85,7 +86,6 @@ jobs:
         run: |
           /opt/forticlient/fortivpn status
 
-      - name: Clean Up
-        run: |
-          rm ./vpnconnect.exp
-          rm ./create_vpn_profile.exp
+      # - name: Clean Up
+      #   run: |
+      #     rm ./vpnconnect.exp
