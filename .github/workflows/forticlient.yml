@@ -8,9 +8,11 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
       - name: Setup FortiClient VPN
-        uses: ./github/actions/forticlient
+        uses: ./.github/actions/forticlient
 
       - name: Set up tmate session
         uses: mxschmitt/action-tmate@v3
