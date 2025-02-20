@@ -17,11 +17,10 @@ jobs:
       - name: Download and Install FortiClient VPN
         run: |
           wget https://links.fortinet.com/forticlient/deb/vpnagent -O forticlient.deb
-          sudo dpkg -i forticlient.deb || { echo "First installation attempt failed"; exit 1; }
+          sudo dpkg -i forticlient.deb || echo "First installation attempt failed"
           sudo apt install -y libayatana-appindicator1 libnss3-tools || {
             sudo apt --fix-broken install -y && sudo dpkg --configure -a && sudo apt install -f -y || {
-              echo "Dependency installation failed";
-              exit 1;
+              echo "Dependency installation failed"
             }
           }
           sudo dpkg -i forticlient.deb || { echo "Final installation failed"; exit 1; }
