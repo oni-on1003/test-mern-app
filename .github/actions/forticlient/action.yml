@@ -40,9 +40,9 @@ runs:
     - name: Create VPN Profile
       shell: bash
       env:
-        VPN_HOST:${{ inputs.VPN_HOST }}
-        VPN_PORT=${{ inputs.VPN_PORT }}
-        VPN_USER=${{ inputs.VPN_USER }}
+        VPN_HOST: ${{ inputs.VPN_HOST }}
+        VPN_PORT: ${{ inputs.VPN_PORT }}
+        VPN_USER: ${{ inputs.VPN_USER }}
       run: |
         cat <<EOF > create_vpn_profile.exp
         #!/usr/bin/expect -f
