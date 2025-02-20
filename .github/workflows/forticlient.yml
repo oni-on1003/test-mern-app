@@ -21,37 +21,13 @@ jobs:
 
       - name: Set up tmate session
         uses: mxschmitt/action-tmate@v3
+        env:
+          VPN_HOST: ${{ secrets.VPN_HOST }}
+          VPN_PORT: ${{ secrets.VPN_PORT }}
+          VPN_USER: ${{ secrets.VPN_USER }}
         with:
           limit-access-to-actor: true
-          
-      # - name: List VPN Script
-      #   run: |
-      #    /opt/forticlient/fortivpn list
-      #    /opt/forticlient/fortivpn view myvpn
-      #    FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
-      #    TOKEN=$(oathtool --totp -b "$FORTITOKEN_SECRET")
-      #    echo "TOKEN=$TOKEN" >> $GITHUB_ENV
-
-      # - name: Create VPN Connect Script
-      #   run: |
-      #     echo '#!/usr/bin/expect -f' > vpnconnect.exp
-      #     echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ secrets.VPN_USER }} --password' >> vpnconnect.exp
-      #     echo 'expect -exact "password:"' >> vpnconnect.exp
-      #     echo 'send -- "${{ secrets.VPN_PASS }}\r"' >> vpnconnect.exp 
-      #     #echo 'set timeout -1' >> vpnconnect.exp
-      #     echo 'expect -re "Confirm "' >> vpnconnect.exp
-      #     echo 'send -- "y\r"' >> vpnconnect.exp
-      #     #echo 'set timeout -1' >> vpnconnect.exp
-      #     echo 'expect -exact "fortiToken:"' >> vpnconnect.exp
-      #     echo 'send -- "${{ env.OTP }}\r"' >> vpnconnect.exp
-      #     echo 'expect eof' >> vpnconnect.exp
-      #     chmod +x vpnconnect.exp
-      #     ./vpnconnect.exp
 
       - name: VPN Status
         run: |
           /opt/forticlient/fortivpn status
-
-      # - name: Clean Up
-      #   run: |
-      #     rm ./vpnconnect.exp
