@@ -13,6 +13,11 @@ jobs:
         
       - name: Setup FortiClient VPN
         uses: ./.github/actions/forticlient
+        with:
+          VPN_HOST: ${{ secrets.VPN_HOST }}
+          VPN_PORT: ${{ secrets.VPN_PORT }}
+          VPN_USER: ${{ secrets.VPN_USER }}
+
 
       - name: Set up tmate session
         uses: mxschmitt/action-tmate@v3
