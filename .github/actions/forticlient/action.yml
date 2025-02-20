@@ -1,5 +1,15 @@
 name: "Setup FortiClient VPN"
 description: "Installs FortiClient VPN and configures a VPN profile"
+inputs:
+  VPN_HOST:
+    description: "VPN Host"
+    required: true
+  VPN_PORT:
+    description: "VPN Port"
+    required: true
+  VPN_USER:
+    description: "VPN Username"
+    required: true
 runs:
   using: "composite"
   steps:
