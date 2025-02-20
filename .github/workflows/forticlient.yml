@@ -12,67 +12,96 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libnss3-tools ppp expect ca-certificates oathtool
-        
+          sudo apt-get install -y ppp expect ca-certificates oathtool
+
+      - name: Enable required repositories
+        run: |
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository universe
+          sudo add-apt-repository multiverse
+          sudo apt-get update
+
+      - name: Install dependencies safely
+        run: |
+          sudo apt-get install -y --no-install-recommends libnss3-tools || echo "libnss3-tools not found, skipping..."
+          sudo apt-get install -y --no-install-recommends libayatana-appindicator1 || echo "libayatana-appindicator1 not found, skipping..."
+          sudo apt-get install -y --no-install-recommends libappindicator1 || echo "libappindicator1 not found, skipping..."
+
+      - name: Install missing dependencies manually
+        run: |
+          wget http://archive.ubuntu.com/ubuntu/pool/universe/liba/libappindicator/libappindicator1_0.4.92-7_amd64.deb || true
+          wget http://archive.ubuntu.com/ubuntu/pool/universe/liba/libayatana-appindicator/libayatana-appindicator1_0.5.90-7_amd64.deb || true
+          sudo dpkg -i libappindicator1_0.4.92-7_amd64.deb || true
+          sudo dpkg -i libayatana-appindicator1_0.5.90-7_amd64.deb || true
+          sudo apt --fix-broken install -y || true
+
       - name: Download and Install FortiClient VPN
         run: |
-          #wget https://filestore.fortinet.com/forticlient/forticlient_vpn_7.4.0.1636_amd64.deb -O forticlient.deb
           wget https://links.fortinet.com/forticlient/deb/vpnagent -O forticlient.deb
-          sudo dpkg -i forticlient.deb || sudo apt-get install -f -y
+          sudo dpkg -i forticlient.deb || (sudo apt --fix-broken install -y && sudo dpkg -i forticlient.deb)
 
-      - name: Create VPN Profile
-        run: |
-          #!/usr/bin/expect
-          echo '#!/usr/bin/expect -f' > create_vpn_profile.exp
-          echo 'spawn /opt/forticlient/fortivpn edit myvpn' >> create_vpn_profile.exp
-          echo 'expect -re "Type"' >> create_vpn_profile.exp
-          echo 'send -- "1\r"' >> create_vpn_profile.exp
-          echo 'set timeout -1' >> create_vpn_profile.exp
-          echo 'expect -re "Remote Gateway:"' >> create_vpn_profile.exp
-          echo 'send -- "${{ secrets.VPN_IP }}\r"' >> create_vpn_profile.exp
-          echo 'set timeout -1' >> create_vpn_profile.exp
-          echo 'expect -re "Port"' >> create_vpn_profile.exp
-          echo 'send -- "${{ secrets.VPN_PORT }}\r"' >> create_vpn_profile.exp
-          echo 'set timeout -1' >> create_vpn_profile.exp
-          echo 'expect -re "Authentication"' >> create_vpn_profile.exp
-          echo 'send -- "3\r"' >> create_vpn_profile.exp
-          echo 'set timeout -1' >> create_vpn_profile.exp
-          echo 'expect -re "Certificate"' >> create_vpn_profile.exp
-          echo 'send -- "3\r"' >> create_vpn_profile.exp
-          echo 'set timeout -1' >> create_vpn_profile.exp
-          echo 'expect eof' >> create_vpn_profile.exp
-          chmod +x create_vpn_profile.exp
-          ./create_vpn_profile.exp
+      - name: Verify Installation
+        run: dpkg -l | grep forticlient || echo "FortiClient installation check failed!"
+        
+      # - name: Download and Install FortiClient VPN
+      #   run: |
+      #     #wget https://filestore.fortinet.com/forticlient/forticlient_vpn_7.4.0.1636_amd64.deb -O forticlient.deb
+      #     wget https://links.fortinet.com/forticlient/deb/vpnagent -O forticlient.deb
+      #     sudo dpkg -i forticlient.deb || sudo apt-get install -f -y
+
+      # - name: Create VPN Profile
+      #   run: |
+      #     #!/usr/bin/expect
+      #     echo '#!/usr/bin/expect -f' > create_vpn_profile.exp
+      #     echo 'spawn /opt/forticlient/fortivpn edit myvpn' >> create_vpn_profile.exp
+      #     echo 'expect -re "Type"' >> create_vpn_profile.exp
+      #     echo 'send -- "1\r"' >> create_vpn_profile.exp
+      #     echo 'set timeout -1' >> create_vpn_profile.exp
+      #     echo 'expect -re "Remote Gateway:"' >> create_vpn_profile.exp
+      #     echo 'send -- "${{ secrets.VPN_IP }}\r"' >> create_vpn_profile.exp
+      #     echo 'set timeout -1' >> create_vpn_profile.exp
+      #     echo 'expect -re "Port"' >> create_vpn_profile.exp
+      #     echo 'send -- "${{ secrets.VPN_PORT }}\r"' >> create_vpn_profile.exp
+      #     echo 'set timeout -1' >> create_vpn_profile.exp
+      #     echo 'expect -re "Authentication"' >> create_vpn_profile.exp
+      #     echo 'send -- "3\r"' >> create_vpn_profile.exp
+      #     echo 'set timeout -1' >> create_vpn_profile.exp
+      #     echo 'expect -re "Certificate"' >> create_vpn_profile.exp
+      #     echo 'send -- "3\r"' >> create_vpn_profile.exp
+      #     echo 'set timeout -1' >> create_vpn_profile.exp
+      #     echo 'expect eof' >> create_vpn_profile.exp
+      #     chmod +x create_vpn_profile.exp
+      #     ./create_vpn_profile.exp
           
-      - name: List VPN Script
-        run: |
-         /opt/forticlient/fortivpn list
-         /opt/forticlient/fortivpn view myvpn
-         FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
-         TOKEN=$(oathtool --totp -b "$FORTITOKEN_SECRET")
-         echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+      # - name: List VPN Script
+      #   run: |
+      #    /opt/forticlient/fortivpn list
+      #    /opt/forticlient/fortivpn view myvpn
+      #    FORTITOKEN_SECRET=${{ secrets.FORTICLIENT_TOKEN }}
+      #    TOKEN=$(oathtool --totp -b "$FORTITOKEN_SECRET")
+      #    echo "TOKEN=$TOKEN" >> $GITHUB_ENV
 
-      - name: Create VPN Connect Script
-        run: |
-          echo '#!/usr/bin/expect -f' > vpnconnect.exp
-          echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ secrets.VPN_USER }} --password' >> vpnconnect.exp
-          echo 'expect -exact "password:"' >> vpnconnect.exp
-          echo 'send -- "${{ secrets.VPN_PASS }}\r"' >> vpnconnect.exp 
-          #echo 'set timeout -1' >> vpnconnect.exp
-          echo 'expect -re "Confirm "' >> vpnconnect.exp
-          echo 'send -- "y\r"' >> vpnconnect.exp
-          #echo 'set timeout -1' >> vpnconnect.exp
-          echo 'expect -exact "fortiToken:"' >> vpnconnect.exp
-          echo 'send -- "${{ env.OTP }}\r"' >> vpnconnect.exp
-          echo 'expect eof' >> vpnconnect.exp
-          chmod +x vpnconnect.exp
-          ./vpnconnect.exp
+      # - name: Create VPN Connect Script
+      #   run: |
+      #     echo '#!/usr/bin/expect -f' > vpnconnect.exp
+      #     echo 'spawn /opt/forticlient/fortivpn connect myvpn --user=${{ secrets.VPN_USER }} --password' >> vpnconnect.exp
+      #     echo 'expect -exact "password:"' >> vpnconnect.exp
+      #     echo 'send -- "${{ secrets.VPN_PASS }}\r"' >> vpnconnect.exp 
+      #     #echo 'set timeout -1' >> vpnconnect.exp
+      #     echo 'expect -re "Confirm "' >> vpnconnect.exp
+      #     echo 'send -- "y\r"' >> vpnconnect.exp
+      #     #echo 'set timeout -1' >> vpnconnect.exp
+      #     echo 'expect -exact "fortiToken:"' >> vpnconnect.exp
+      #     echo 'send -- "${{ env.OTP }}\r"' >> vpnconnect.exp
+      #     echo 'expect eof' >> vpnconnect.exp
+      #     chmod +x vpnconnect.exp
+      #     ./vpnconnect.exp
 
-      - name: VPN Status
-        run: |
-          /opt/forticlient/fortivpn status
+      # - name: VPN Status
+      #   run: |
+      #     /opt/forticlient/fortivpn status
 
-      - name: Clean Up
-        run: |
-          rm ./vpnconnect.exp
-          rm ./create_vpn_profile.exp
+      # - name: Clean Up
+      #   run: |
+      #     rm ./vpnconnect.exp
+      #     rm ./create_vpn_profile.exp
