@@ -14,31 +14,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ppp expect ca-certificates oathtool
 
-      - name: Enable required repositories
-        run: |
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository universe
-          sudo add-apt-repository multiverse
-          sudo apt-get update
-
-      - name: Install dependencies safely
-        run: |
-          sudo apt-get install -y --no-install-recommends libnss3-tools || echo "libnss3-tools not found, skipping..."
-          sudo apt-get install -y --no-install-recommends libayatana-appindicator1 || echo "libayatana-appindicator1 not found, skipping..."
-          sudo apt-get install -y --no-install-recommends libappindicator1 || echo "libappindicator1 not found, skipping..."
-
-      - name: Install missing dependencies manually
-        run: |
-          wget http://archive.ubuntu.com/ubuntu/pool/universe/liba/libappindicator/libappindicator1_0.4.92-7_amd64.deb || true
-          wget http://archive.ubuntu.com/ubuntu/pool/universe/liba/libayatana-appindicator/libayatana-appindicator1_0.5.90-7_amd64.deb || true
-          sudo dpkg -i libappindicator1_0.4.92-7_amd64.deb || true
-          sudo dpkg -i libayatana-appindicator1_0.5.90-7_amd64.deb || true
-          sudo apt --fix-broken install -y || true
-
       - name: Download and Install FortiClient VPN
         run: |
           wget https://links.fortinet.com/forticlient/deb/vpnagent -O forticlient.deb
-          sudo dpkg -i forticlient.deb || (sudo apt --fix-broken install -y && sudo dpkg -i forticlient.deb)
+          sudo dpkg -i forticlient.deb || { echo "First installation attempt failed"; exit 1; }
+          sudo apt install -y libayatana-appindicator1 libnss3-tools || {
+            sudo apt --fix-broken install -y && sudo dpkg --configure -a && sudo apt install -f -y || {
+              echo "Dependency installation failed";
+              exit 1;
+            }
+          }
+          sudo dpkg -i forticlient.deb || { echo "Final installation failed"; exit 1; }
+          
 
       - name: Verify Installation
         run: dpkg -l | grep forticlient || echo "FortiClient installation check failed!"
